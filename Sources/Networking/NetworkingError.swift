@@ -145,6 +145,7 @@ public struct NetworkingError: Error, LocalizedError {
     public var status: Status
     public var code: Int { return status.rawValue }
     public var jsonPayload: Any?
+    public var underlyingError: Error?
     
     public init(errorCode: Int) {
         self.status = Status(rawValue: errorCode) ?? .unknown
@@ -155,21 +156,28 @@ public struct NetworkingError: Error, LocalizedError {
     }
     
     public init(error: Error) {
+        
+        self.underlyingError = error
+        
         if let networkingError = error as? NetworkingError {
             self.status = networkingError.status
             self.jsonPayload = networkingError.jsonPayload
+        } else if let theError = error as? URLError {
+            self.status = Status(rawValue: theError.errorCode) ?? .unknown
+        } else if let _ = error as? DecodingError {
+            self.status = .cannotParseResponse
         } else {
-            if let theError = error as? URLError {
-                self.status = Status(rawValue: theError.errorCode) ?? .unknown
-            } else {
-                self.status = .unknown
-            }
+            self.status = .unknown
         }
     }
     
     // for LocalizedError protocol
     public var errorDescription: String? {
-        return "\(self.status)"
+        var output =  "\(self.status)"
+        if let error = self.underlyingError {
+            output += " - underlyingError: \(error.localizedDescription)"
+        }
+        return output
     }
     
 }

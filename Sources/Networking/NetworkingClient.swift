@@ -20,7 +20,7 @@ public class NetworkingClient: NSObject {
     
     public var defaultCollectionParsingKeyPath: String?
     public var headers = [String: String]()
-    public var parameterEncoding = ParameterEncoding.urlEncoded
+    public var parameterEncoding = ParameterEncoding.json
 
     private let customSession: URLSession?
     
