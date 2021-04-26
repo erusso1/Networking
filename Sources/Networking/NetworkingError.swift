@@ -175,7 +175,7 @@ public struct NetworkingError: Error, LocalizedError {
     public var errorDescription: String? {
         var output =  "\(self.status)"
         if let error = self.underlyingError {
-            output += " - underlyingError: \(error.localizedDescription)"
+            output += " - underlyingError: \(error)"
         }
         return output
     }
