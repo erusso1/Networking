@@ -11,7 +11,7 @@ import Combine
 
 public protocol NetworkingJSONDecodable {
     /// The method you declare your JSON mapping in.
-    static func decode(_ json: Any) throws -> Self
+    static func decode(_ json: Any, decoder: JSONDecoder) throws -> Self
 }
 
 public extension NetworkingClient {
@@ -20,7 +20,7 @@ public extension NetworkingClient {
                                          params: Params = Params(),
                                          keypath: String? = nil) -> AnyPublisher<T, Error> {
         return get(route, params: params)
-            .tryMap { json -> T in try NetworkingParser().toModel(json, keypath: keypath) }
+            .tryMap { json -> T in try NetworkingParser(decoder: self.responseDecoder).toModel(json, keypath: keypath) }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
@@ -31,7 +31,7 @@ public extension NetworkingClient {
                                          keypath: String? = nil) -> AnyPublisher<[T], Error> {
         let keypath = keypath ?? defaultCollectionParsingKeyPath
         return get(route, params: params)
-            .tryMap { json -> [T] in try NetworkingParser().toModels(json, keypath: keypath) }
+            .tryMap { json -> [T] in try NetworkingParser(decoder: self.responseDecoder).toModels(json, keypath: keypath) }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
@@ -40,7 +40,7 @@ public extension NetworkingClient {
                                           params: Params = Params(),
                                           keypath: String? = nil) -> AnyPublisher<T, Error> {
         return post(route, params: params)
-            .tryMap { json -> T in try NetworkingParser().toModel(json, keypath: keypath) }
+            .tryMap { json -> T in try NetworkingParser(decoder: self.responseDecoder).toModel(json, keypath: keypath) }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
@@ -49,7 +49,7 @@ public extension NetworkingClient {
                                          params: Params = Params(),
                                          keypath: String? = nil) -> AnyPublisher<T, Error> {
         return put(route, params: params)
-            .tryMap { json -> T in try NetworkingParser().toModel(json, keypath: keypath) }
+            .tryMap { json -> T in try NetworkingParser(decoder: self.responseDecoder).toModel(json, keypath: keypath) }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
@@ -58,7 +58,7 @@ public extension NetworkingClient {
                                            params: Params = Params(),
                                            keypath: String? = nil) -> AnyPublisher<T, Error> {
         return patch(route, params: params)
-            .tryMap { json -> T in try NetworkingParser().toModel(json, keypath: keypath) }
+            .tryMap { json -> T in try NetworkingParser(decoder: self.responseDecoder).toModel(json, keypath: keypath) }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
@@ -67,7 +67,7 @@ public extension NetworkingClient {
                                             params: Params = Params(),
                                             keypath: String? = nil) -> AnyPublisher<T, Error> {
         return delete(route, params: params)
-            .tryMap { json -> T in try NetworkingParser().toModel(json, keypath: keypath) }
+            .tryMap { json -> T in try NetworkingParser(decoder: self.responseDecoder).toModel(json, keypath: keypath) }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
@@ -76,8 +76,7 @@ public extension NetworkingClient {
 // Provide default implementation for Decodable models.
 public extension NetworkingJSONDecodable where Self: Decodable {
 
-    static func decode(_ json: Any) throws -> Self {
-        let decoder = JSONDecoder()
+    static func decode(_ json: Any, decoder: JSONDecoder) throws -> Self {
         let data = try JSONSerialization.data(withJSONObject: json, options: [])
         let model = try decoder.decode(Self.self, from: data)
         return model

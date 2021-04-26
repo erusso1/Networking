@@ -34,7 +34,7 @@ public extension NetworkingClient {
               multipartData: [MultipartData]) -> AnyPublisher<(Data?, Progress), Error> {
         let req = request(.post, route, params: params)
         req.multipartData = multipartData
-        return req.uploadPublisher()
+        return req.uploadPublisher(urlSession: self.session)
     }
 
     func put(_ route: String,
@@ -42,7 +42,7 @@ public extension NetworkingClient {
              multipartData: [MultipartData]) -> AnyPublisher<(Data?, Progress), Error> {
         let req = request(.put, route, params: params)
         req.multipartData = multipartData
-        return req.uploadPublisher()
+        return req.uploadPublisher(urlSession: self.session)
     }
 
     func patch(_ route: String,
@@ -50,6 +50,6 @@ public extension NetworkingClient {
                multipartData: [MultipartData]) -> AnyPublisher<(Data?, Progress), Error> {
         let req = request(.patch, route, params: params)
         req.multipartData = multipartData
-        return req.uploadPublisher()
+        return req.uploadPublisher(urlSession: self.session)
     }
 }

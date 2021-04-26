@@ -9,13 +9,17 @@ import Foundation
 
 
 public struct NetworkingParser {
+    
+    private let decoder: JSONDecoder
 
-    public init() {}
+    public init(decoder: JSONDecoder) {
+        self.decoder = decoder
+    }
 
     public func toModel<T: NetworkingJSONDecodable>(_ json: Any, keypath: String? = nil) throws -> T {
         do {
             let data = resourceData(from: json, keypath: keypath)
-            return try T.decode(data)
+            return try T.decode(data, decoder: self.decoder)
         } catch (let error) {
             throw error
         }
@@ -27,7 +31,7 @@ public struct NetworkingParser {
                 return [T]()
             }
             return try array.map {
-                try T.decode($0)
+                try T.decode($0, decoder: self.decoder)
             }.compactMap { $0 }
         } catch (let error) {
             throw error

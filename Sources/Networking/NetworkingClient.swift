@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public struct NetworkingClient {
+public class NetworkingClient: NSObject {
 
     /**
         Instead of using the same keypath for every call eg: "collection",
@@ -9,12 +9,21 @@ public struct NetworkingClient {
         This is overidden by the per-request keypath if present.
      
      */
-    public var defaultCollectionParsingKeyPath: String?
+    
     let baseURL: String
+    let requestEncoder: JSONEncoder
+    let responseDecoder: JSONDecoder
+    
+    lazy var session: URLSession = {
+        customSession ?? URLSession.shared
+    }()
+    
+    public var defaultCollectionParsingKeyPath: String?
     public var headers = [String: String]()
     public var parameterEncoding = ParameterEncoding.urlEncoded
-    public var timeout: TimeInterval?
 
+    private let customSession: URLSession?
+    
     /**
         Prints network calls to the console.
         Values Available are .None, Calls and CallsAndResponses.
@@ -27,9 +36,11 @@ public struct NetworkingClient {
 
     private let logger = NetworkingLogger()
 
-    public init(baseURL: String, timeout: TimeInterval? = nil) {
+    public init(baseURL: String, requestEncoder: JSONEncoder = .init(), responseDecoder: JSONDecoder = .init(), session: URLSession? = nil) {
         self.baseURL = baseURL
-        self.timeout = timeout
+        self.customSession = session
+        self.requestEncoder = requestEncoder
+        self.responseDecoder = responseDecoder
     }
 }
 
