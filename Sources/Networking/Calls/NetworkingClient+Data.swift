@@ -30,3 +30,36 @@ public extension NetworkingClient {
         request(.delete, route, params: params).publisher(urlSession: self.session)
     }
 }
+
+public extension NetworkingClient {
+    
+    func get<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        requestPublisher(.get, route: route, params: params)
+    }
+    
+    func post<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        requestPublisher(.post, route: route, params: params)
+    }
+    
+    func put<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        requestPublisher(.put, route: route, params: params)
+    }
+
+    func patch<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        requestPublisher(.patch, route: route, params: params)
+    }
+
+    func delete<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        requestPublisher(.delete, route: route, params: params)
+    }
+    
+    private func requestPublisher<T: Encodable>(_ httpVerb: HTTPVerb, route: String, params: T) -> AnyPublisher<Data, Error> {
+        do {
+            let request = try request(httpVerb, route, params: params)
+            return request.publisher(urlSession: self.session)
+        }
+        catch {
+            return Fail(outputType: Data.self, failure: error).eraseToAnyPublisher()
+        }
+    }
+}

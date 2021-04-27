@@ -41,4 +41,25 @@ public extension NetworkingClient {
         req.parameterEncoding = parameterEncoding
         return req
     }
+    
+    internal func request<T: Encodable>(_ httpVerb: HTTPVerb, _ route: String, params: T) throws -> NetworkingRequest {
+        let req = NetworkingRequest()
+        req.baseURL = baseURL
+        req.logLevels = logLevels
+        req.headers = headers
+        req.httpVerb = httpVerb
+        req.route = route
+        req.params = try encodableToParams(params)
+        req.parameterEncoding = parameterEncoding
+        return req
+    }
+    
+    private func encodableToParams<T: Encodable>(_ input: T) throws -> Params {
+        
+        let data = try requestEncoder.encode(input)
+        guard let dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Params else {
+            throw EncodingError.invalidValue("Encodable", EncodingError.Context(codingPath: [], debugDescription: "Could not cast JSON content to Params", underlyingError: nil))
+        }
+        return dictionary
+    }
 }

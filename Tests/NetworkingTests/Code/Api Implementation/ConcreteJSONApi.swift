@@ -20,4 +20,13 @@ struct ConcreteApi: Api, NetworkingService {
     func fetchPosts() -> AnyPublisher<[Post], Error> {
         get("/posts")
     }
+    
+    func fetchThings() -> AnyPublisher<Data, Error> {
+        
+        struct Thing: Encodable {
+            let name: String
+        }
+        
+        return get("/users", params: Thing(name: "hello"))
+    }
 }

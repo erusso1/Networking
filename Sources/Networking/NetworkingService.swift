@@ -38,6 +38,26 @@ public extension NetworkingService {
         network.delete(route, params: params)
     }
     
+    func get<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        network.get(route, params: params)
+    }
+    
+    func post<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        network.post(route, params: params)
+    }
+    
+    func put<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        network.put(route, params: params)
+    }
+    
+    func patch<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        network.patch(route, params: params)
+    }
+    
+    func delete<T: Encodable>(_ route: String, params: T) -> AnyPublisher<Data, Error> {
+        network.delete(route, params: params)
+    }
+    
     // Void
     
     func get(_ route: String, params: Params = Params()) -> AnyPublisher<Void, Error> {
